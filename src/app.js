@@ -4,10 +4,10 @@ import { GlobalStyle } from './style'
 import { QuickSelect } from './quickselect/component'
 
 const items = [
-  { title: 'alpha', subtitle: 'src' },
-  { title: 'bravo', subtitle: 'src' },
-  { title: 'charlie', subtitle: 'src' },
-  { title: 'delta', subtitle: 'src' }
+  { title: 'alpha', subtitle: 'src', icon: 'assets/material-icons/git.svg' },
+  { title: 'bravo', subtitle: 'src', icon: 'assets/material-icons/babel.svg' },
+  { title: 'charlie', subtitle: 'src', icon: 'assets/material-icons/nodejs.svg' },
+  { title: 'delta', subtitle: 'src', icon: 'assets/material-icons/file.svg' }
 ]
 
 export default class App extends PureComponent {
@@ -17,7 +17,7 @@ export default class App extends PureComponent {
         <GlobalStyle />
         <QuickSelect
           items={items}
-          darkTheme={false}
+          darkTheme={true}
           onClosed={() => {
             console.log('onClosed')
           }}
