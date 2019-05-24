@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
-import { MenuItem, Dialog, Classes } from '@blueprintjs/core'
+import { MenuItem, Dialog, Classes, Intent } from '@blueprintjs/core'
 import { Suggest } from '@blueprintjs/select'
+import { toJS } from 'mobx'
 
 require('./bp3.css')
 
@@ -62,7 +63,7 @@ function highlightText(text = '', query) {
 
 export class QuickSelect extends React.Component {
   state = {
-    content: [],
+    intent: Intent.PRIMARY,
     isOpen: true
   }
 
@@ -100,24 +101,6 @@ export class QuickSelect extends React.Component {
         textClassName="menu-item"
       />
     )
-
-    // return (
-    //   <MenuItem
-    //     active={modifiers.active}
-    //     disabled={modifiers.disabled}
-    //     key={item}
-    //     onClick={handleClick}
-    //     text={item}
-    //     textClassName="menu-item"
-    //   />
-    // )
-  }
-
-  filterItems = (query, items) => {
-    return items.filter(({ title, subtitle }) => {
-      const text = `${title}/${subtitle || ''}`
-      return text.toLowerCase().indexOf(query.toLowerCase()) >= 0
-    })
   }
 
   onQueryChange = query => {
@@ -164,7 +147,7 @@ export class QuickSelect extends React.Component {
           <Suggest
             items={this.props.items}
             itemRenderer={this.renderItem}
-            itemListPredicate={this.filterItems}
+            itemListPredicate={this.props.filterItems}
             onQueryChange={this.onQueryChange}
             closeOnSelect={true}
             openOnKeyDown={false}
@@ -187,6 +170,7 @@ export class QuickSelect extends React.Component {
               },
               small: true,
               fill: true,
+              intent: this.state.intent,
               className: 'quickOpenInput',
               placeholder
             }}
