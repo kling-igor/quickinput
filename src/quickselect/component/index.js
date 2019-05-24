@@ -5,10 +5,82 @@ import { Suggest } from '@blueprintjs/select'
 
 require('./bp3.css')
 
+const ItemIconStyle = styled.img`
+  margin-right: 4px;
+`
+
+const TitleMenuItemStyle = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+`
+
+const SubtitleMenuItemStyle = styled.span`
+  font-size: 12px;
+  opacity: 0.7;
+`
+
+function escapeRegExpChars(text) {
+  return text.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1')
+}
+
+function highlightText(text = '', query) {
+  let lastIndex = 0
+  const words = query
+    .split(/\s+/)
+    .filter(word => word.length > 0)
+    .map(escapeRegExpChars)
+  if (words.length === 0) {
+    return [text]
+  }
+  const regexp = new RegExp(words.join('|'), 'gi')
+  const tokens = []
+  while (true) {
+    const match = regexp.exec(text)
+    if (!match) {
+      break
+    }
+    const length = match[0].length
+    const before = text.slice(lastIndex, regexp.lastIndex - length)
+    if (before.length > 0) {
+      tokens.push(before)
+    }
+    lastIndex = regexp.lastIndex
+    tokens.push(
+      <strong key={lastIndex} style={{}}>
+        {match[0]}
+      </strong>
+    )
+  }
+  const rest = text.slice(lastIndex)
+  if (rest.length > 0) {
+    tokens.push(rest)
+  }
+  return tokens
+}
+
 export class QuickSelect extends React.Component {
   state = {
     content: [],
     isOpen: true
+  }
+
+  renderMenuItem = ({ icon, title, subtitle }, query) => {
+    return (
+      <TitleMenuItemStyle>
+        {!!icon && <ItemIconStyle height="16" width="16" src={icon} />}
+        <span>
+          {highlightText(title, query)}
+          {!!subtitle && (
+            <>
+              <span> </span>
+              <SubtitleMenuItemStyle>{highlightText(subtitle, query)}</SubtitleMenuItemStyle>
+            </>
+          )}
+        </span>
+      </TitleMenuItemStyle>
+    )
   }
 
   renderItem = (item, { handleClick, modifiers, query }) => {
@@ -16,32 +88,45 @@ export class QuickSelect extends React.Component {
       return null
     }
 
+    const { title, subtitle } = item
+
     return (
       <MenuItem
         active={modifiers.active}
         disabled={modifiers.disabled}
-        key={item}
+        key={`${title}/${subtitle || ''}`}
         onClick={handleClick}
-        text={item}
+        text={this.renderMenuItem(item, query)}
         textClassName="menu-item"
       />
     )
+
+    // return (
+    //   <MenuItem
+    //     active={modifiers.active}
+    //     disabled={modifiers.disabled}
+    //     key={item}
+    //     onClick={handleClick}
+    //     text={item}
+    //     textClassName="menu-item"
+    //   />
+    // )
   }
 
   filterItems = (query, items) => {
-    return items.filter(item => {
-      return item.toLowerCase().indexOf(query.toLowerCase()) >= 0
+    return items.filter(({ title, subtitle }) => {
+      const text = `${title}/${subtitle || ''}`
+      return text.toLowerCase().indexOf(query.toLowerCase()) >= 0
     })
   }
 
   onQueryChange = query => {
-    console.log('query:', query)
     // тут можно, например, вызывать колбек для перехода на строку редактора
   }
 
   handleValueChange = value => {
     this.setState({ isOpen: false })
-    console.log('SELECT:', value)
+    this.props.onSelect(value)
   }
 
   renderInputValue = inputValue => {
@@ -49,6 +134,8 @@ export class QuickSelect extends React.Component {
   }
 
   render() {
+    const { placeholder, hint } = this.props
+
     return (
       <Dialog
         autoFocus={true}
@@ -71,7 +158,7 @@ export class QuickSelect extends React.Component {
           className={Classes.DIALOG_BODY}
           style={{
             width: 500,
-            height: 64 //  /* если выбор из списка, то маленькая (32), если ручной ввод и требуется подсказка, то большая 64 */
+            height: hint ? 64 : 32 //  /* если выбор из списка, то маленькая (32), если ручной ввод и требуется подсказка, то большая 64 */
           }}
         >
           <Suggest
@@ -85,7 +172,7 @@ export class QuickSelect extends React.Component {
             resetOnQuery={true}
             resetOnSelect={false}
             inputValueRenderer={this.renderInputValue}
-            // noResults={<div style={{ height: 0 }} /> /*<MenuItem disabled={true} text="No result..." />*/}
+            noResults={<MenuItem disabled={true} text="No results found" />}
             onItemSelect={this.handleValueChange}
             usePortal={false}
             popoverProps={{
@@ -101,7 +188,7 @@ export class QuickSelect extends React.Component {
               small: true,
               fill: true,
               className: 'quickOpenInput',
-              placeholder: "Type '?' to get help on the actions you can take from here"
+              placeholder
             }}
           />
         </div>
