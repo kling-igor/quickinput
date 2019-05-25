@@ -80,11 +80,11 @@ export default class App extends PureComponent {
           placeHolder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
         /> */}
 
-        {/* <Input
+        <Input
           placeHolder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
           validateInput={controllerFilenameValidator}
           onSelect={value => console.log(value)}
-        /> */}
+        />
 
         {/* <QuickPick
           items={items}
@@ -93,12 +93,12 @@ export default class App extends PureComponent {
           onSelect={value => console.log(value)}
         /> */}
 
-        <InputUnique
+        {/* <InputUnique
           items={items}
           placeHolder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
           validateInput={controllerFilenameValidator}
           onSelect={value => console.log(value)}
-        />
+        /> */}
       </>
     )
   }

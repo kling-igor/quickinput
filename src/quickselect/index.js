@@ -10,9 +10,7 @@ export const Input = ({ placeHolder, validateInput = () => true, onSelect = () =
       inputValidator={validateInput}
       items={[]}
       darkTheme={true}
-      onSelect={({ label }) => {
-        onSelect(label)
-      }}
+      onSelect={onSelect}
       placeHolder={placeHolder}
     />
   )
@@ -24,9 +22,7 @@ export const QuickPick = ({ items, placeHolder, noResultsText, onSelect = () => 
       items={items}
       noResultsText={noResultsText}
       darkTheme={true}
-      onSelect={({ label }) => {
-        onSelect(label)
-      }}
+      onSelect={onSelect}
       placeHolder={placeHolder}
     />
   )
@@ -39,9 +35,7 @@ export const InputUnique = ({ items, placeHolder, validateInput, onSelect = () =
       inputValidator={validateInput}
       items={items}
       darkTheme={true}
-      onSelect={({ label }) => {
-        onSelect(label)
-      }}
+      onSelect={onSelect}
       placeHolder={placeHolder}
     />
   )

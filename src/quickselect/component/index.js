@@ -137,7 +137,7 @@ export class QuickSelect extends React.Component {
     }
 
     this.setState({ isOpen: false })
-    this.props.onSelect(value)
+    this.props.onSelect(value.label)
   }
 
   renderInputValue = ({ label }) => {
