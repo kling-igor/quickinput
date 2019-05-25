@@ -14,14 +14,14 @@ const ItemIconStyle = styled.img`
   margin-right: 4px;
 `
 
-const TitleMenuItemStyle = styled.div`
+const LabelMenuItemStyle = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
 `
 
-const SubtitleMenuItemStyle = styled.span`
+const DetailMenuItemStyle = styled.span`
   font-size: 12px;
   opacity: 0.7;
 `
@@ -66,8 +66,8 @@ function highlightText(text = '', query) {
 }
 
 const filterItems = (query, items) => {
-  const filteredItems = items.filter(({ title, subtitle }) => {
-    const text = `${title}/${subtitle || ''}`
+  const filteredItems = items.filter(({ label, detail }) => {
+    const text = `${label}/${detail || ''}`
     return text.toLowerCase().indexOf(query.toLowerCase()) >= 0
   })
 
@@ -80,20 +80,20 @@ export class QuickSelect extends React.Component {
     isOpen: true
   }
 
-  renderMenuItem = ({ icon, title, subtitle }, query) => {
+  renderMenuItem = ({ icon, label, detail }, query) => {
     return (
-      <TitleMenuItemStyle>
+      <LabelMenuItemStyle>
         {!!icon && <ItemIconStyle height="16" width="16" src={icon} />}
         <span>
-          {highlightText(title, query)}
-          {!!subtitle && (
+          {highlightText(label, query)}
+          {!!detail && (
             <>
               <span> </span>
-              <SubtitleMenuItemStyle>{highlightText(subtitle, query)}</SubtitleMenuItemStyle>
+              <DetailMenuItemStyle>{highlightText(detail, query)}</DetailMenuItemStyle>
             </>
           )}
         </span>
-      </TitleMenuItemStyle>
+      </LabelMenuItemStyle>
     )
   }
 
@@ -102,13 +102,13 @@ export class QuickSelect extends React.Component {
       return null
     }
 
-    const { title, subtitle } = item
+    const { label, detail } = item
 
     return (
       <MenuItem
         active={modifiers.active}
         disabled={modifiers.disabled}
-        key={`${title}/${subtitle || ''}`}
+        key={`${label}/${detail || ''}`}
         onClick={handleClick}
         text={this.renderMenuItem(item, query)}
         textClassName="menu-item"
@@ -140,8 +140,8 @@ export class QuickSelect extends React.Component {
     this.props.onSelect(value)
   }
 
-  renderInputValue = ({ title }) => {
-    return title
+  renderInputValue = ({ label }) => {
+    return label
   }
 
   renderCreateOption = (query, active, handleClick) => (
@@ -155,7 +155,7 @@ export class QuickSelect extends React.Component {
   render() {
     const {
       items,
-      placeholder,
+      placeHolder,
       hint,
       shouldCreateNewItems = false,
       shouldRenderCreateNewItem = false,
@@ -166,7 +166,7 @@ export class QuickSelect extends React.Component {
     const noResults = noResultsText ? <MenuItem disabled={true} text={noResultsText} /> : null
     const maybeCreateNewItemRenderer =
       shouldRenderCreateNewItem && !this.state.isInvalid ? this.renderCreateOption : null
-    const maybeCreateNewItemFromQuery = shouldCreateNewItems ? query => ({ title: query }) : null
+    const maybeCreateNewItemFromQuery = shouldCreateNewItems ? query => ({ label: query }) : null
 
     return (
       <Dialog
@@ -218,7 +218,7 @@ export class QuickSelect extends React.Component {
               fill: true,
               intent: this.state.isInvalid ? Intent.DANGER : Intent.PRIMARY,
               className: 'quickOpenInput',
-              placeholder
+              placeholder: placeHolder
             }}
           />
         </SuggestContainerStyle>

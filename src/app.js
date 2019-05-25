@@ -4,10 +4,10 @@ import { GlobalStyle } from './style'
 import { QuickSelect } from './quickselect/component'
 
 const items = [
-  { title: 'alpha.js', subtitle: 'src', icon: 'assets/material-icons/git.svg' },
-  { title: 'bravo.js', subtitle: 'src', icon: 'assets/material-icons/babel.svg' },
-  { title: 'charlie.js', subtitle: 'src', icon: 'assets/material-icons/nodejs.svg' },
-  { title: 'delta.js', subtitle: 'src', icon: 'assets/material-icons/file.svg' }
+  { label: 'alpha.js', detail: 'src', icon: 'assets/material-icons/git.svg' },
+  { label: 'bravo.js', detail: 'src', icon: 'assets/material-icons/babel.svg' },
+  { label: 'charlie.js', detail: 'src', icon: 'assets/material-icons/nodejs.svg' },
+  { label: 'delta.js', detail: 'src', icon: 'assets/material-icons/file.svg' }
 ]
 
 const filenameValidator = input => /^[\w\-]*\.[A-Za-z]{2,4}$/.test(input)
@@ -16,8 +16,8 @@ const jsFilenameValidator = input => /^[\w\-]+\.js$/.test(input)
 
 // const filterItemsNoSpaces = (query, items) => {
 //   const filteredQuery = query.replace(/\s*|\..*$/gi, '')
-//   const filteredItems = items.filter(({ title, subtitle }) => {
-//     return title.toLowerCase().indexOf(filteredQuery.toLowerCase()) >= 0
+//   const filteredItems = items.filter(({ label, detail }) => {
+//     return label.toLowerCase().indexOf(filteredQuery.toLowerCase()) >= 0
 //   })
 
 //   return filteredItems
@@ -46,7 +46,7 @@ export default class App extends PureComponent {
             console.log('closed:', this.state.selectedValue)
           }}
           onSelect={this.onValueSelect}
-          placeholder="Select an item"
+          placeHolder="Select an item"
         /> */}
 
         {/* ввод нового значения с подсказкой уже существующих */}
@@ -59,7 +59,7 @@ export default class App extends PureComponent {
             console.log('closed:', this.state.selectedValue)
           }}
           onSelect={this.onValueSelect}
-          placeholder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
+          placeHolder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
         />
 
         {/* ввод значения без подсказок */}
@@ -73,7 +73,7 @@ export default class App extends PureComponent {
             console.log('closed:', this.state.selectedValue)
           }}
           onSelect={this.onValueSelect}
-          placeholder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
+          placeHolder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
         /> */}
       </>
     )
