@@ -10,59 +10,71 @@ const items = [
   { title: 'delta.js', subtitle: 'src', icon: 'assets/material-icons/file.svg' }
 ]
 
-const filterItems = (query, items) => {
-  const filteredItems = items.filter(({ title, subtitle }) => {
-    const text = `${title}/${subtitle || ''}`
-    return text.toLowerCase().indexOf(query.toLowerCase()) >= 0
-  })
+const filenameValidator = input => /^[\w\-]*\.[A-Za-z]{2,4}$/.test(input)
+const jsonFilenameValidator = input => /^[\w\-]+\.json$/.test(input)
+const jsFilenameValidator = input => /^[\w\-]+\.js$/.test(input)
 
-  return filteredItems
-}
+// const filterItemsNoSpaces = (query, items) => {
+//   const filteredQuery = query.replace(/\s*|\..*$/gi, '')
+//   const filteredItems = items.filter(({ title, subtitle }) => {
+//     return title.toLowerCase().indexOf(filteredQuery.toLowerCase()) >= 0
+//   })
 
-const filterItems2 = (query, items) => {
-  const filteredQuery = query.replace(/\s*|\..*$/gi, '')
-  const filteredItems = items.filter(({ title, subtitle }) => {
-    return title.toLowerCase().indexOf(filteredQuery.toLowerCase()) >= 0
-  })
-
-  return filteredItems
-}
+//   return filteredItems
+// }
 
 export default class App extends PureComponent {
+  state = {
+    selectedValue: null
+  }
+
+  onValueSelect = value => {
+    this.setState({ selectedValue: value })
+  }
+
   render() {
     return (
       <>
         <GlobalStyle />
 
-        {/* ввод знычения из списка 
-        
-        <QuickSelect
+        {/* ввод значения только из списка  */}
+        {/* <QuickSelect
           items={items}
-          filterItems={filterItems}
           noResultsText="No results found"
           darkTheme={true}
           onClosed={() => {
-            console.log('onClosed')
+            console.log('closed:', this.state.selectedValue)
           }}
-          onSelect={value => {
-            console.log('SELECT:', value)
-          }}
+          onSelect={this.onValueSelect}
           placeholder="Select an item"
-        />
-         */}
+        /> */}
 
+        {/* ввод нового значения с подсказкой уже существующих */}
         <QuickSelect
           shouldCreateNewItems={true}
-          filterItems={filterItems2}
+          inputValidator={jsFilenameValidator}
           items={items}
-          noResultsText={null}
           darkTheme={true}
-          onClosed={() => {}}
-          onSelect={({ title }) => {
-            console.log('SELECT:', title)
+          onClosed={() => {
+            console.log('closed:', this.state.selectedValue)
           }}
-          placeholder="Controller name"
+          onSelect={this.onValueSelect}
+          placeholder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
         />
+
+        {/* ввод значения без подсказок */}
+        {/* <QuickSelect
+          shouldCreateNewItems={true}
+          shouldRenderCreateNewItem={false}
+          inputValidator={jsFilenameValidator}
+          items={[]}
+          darkTheme={true}
+          onClosed={() => {
+            console.log('closed:', this.state.selectedValue)
+          }}
+          onSelect={this.onValueSelect}
+          placeholder="Provide controller name (Press 'Enter' to confirm or 'Esc' to cancel)"
+        /> */}
       </>
     )
   }

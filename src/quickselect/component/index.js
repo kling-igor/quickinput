@@ -2,9 +2,13 @@ import React from 'react'
 import styled from 'styled-components'
 import { MenuItem, Dialog, Classes, Intent } from '@blueprintjs/core'
 import { Suggest } from '@blueprintjs/select'
-import { toJS } from 'mobx'
 
 require('./bp3.css')
+
+const SuggestContainerStyle = styled.div`
+  width: 500px;
+  height: ${({ hint }) => (hint ? '64px' : '32px')};
+`
 
 const ItemIconStyle = styled.img`
   margin-right: 4px;
@@ -61,6 +65,15 @@ function highlightText(text = '', query) {
   return tokens
 }
 
+const filterItems = (query, items) => {
+  const filteredItems = items.filter(({ title, subtitle }) => {
+    const text = `${title}/${subtitle || ''}`
+    return text.toLowerCase().indexOf(query.toLowerCase()) >= 0
+  })
+
+  return filteredItems
+}
+
 export class QuickSelect extends React.Component {
   state = {
     intent: Intent.PRIMARY,
@@ -105,7 +118,10 @@ export class QuickSelect extends React.Component {
 
   onQueryChange = query => {
     // тут можно, например, вызывать колбек для перехода на строку редактора
-    this.setState({ isInvalid: /\s/.test(query) })
+
+    if (this.props.shouldCreateNewItems && this.props.inputValidator) {
+      this.setState({ isInvalid: !this.props.inputValidator(query) })
+    }
   }
 
   handleValueChange = value => {
@@ -132,14 +148,25 @@ export class QuickSelect extends React.Component {
     <MenuItem icon="add" text={`Create "${query}"`} active={active} onClick={handleClick} shouldDismissPopover={true} />
   )
 
+  dialogClose = () => {
+    this.setState({ isOpen: false })
+  }
+
   render() {
-    const { placeholder, hint } = this.props
+    const {
+      items,
+      placeholder,
+      hint,
+      shouldCreateNewItems = false,
+      shouldRenderCreateNewItem = false,
+      noResultsText = null,
+      onClosed
+    } = this.props
 
-    const noResults = this.props.noResultsText ? <MenuItem disabled={true} text={this.props.noResultsText} /> : null
-
+    const noResults = noResultsText ? <MenuItem disabled={true} text={noResultsText} /> : null
     const maybeCreateNewItemRenderer =
-      this.props.shouldCreateNewItems && !this.state.isInvalid ? this.renderCreateOption : null
-    const maybeCreateNewItemFromQuery = this.props.shouldCreateNewItems ? query => ({ title: query }) : null
+      shouldRenderCreateNewItem && !this.state.isInvalid ? this.renderCreateOption : null
+    const maybeCreateNewItemFromQuery = shouldCreateNewItems ? query => ({ title: query }) : null
 
     return (
       <Dialog
@@ -149,29 +176,24 @@ export class QuickSelect extends React.Component {
         transitionDuration={0}
         // backdropClassName="backdrop"
         inputProps={{ small: true, fill: true }}
-        onClosed={this.props.onClosed}
+        onClosed={onClosed}
         canEscapeKeyClose={true}
         canOutsideClickClose={true}
-        onClose={() => {
-          this.setState({ isOpen: false })
-        }}
+        onClose={this.dialogClose}
       >
-        <div
+        <SuggestContainerStyle
           ref={ref => {
             this.divRef = ref
           }}
           className={Classes.DIALOG_BODY}
-          style={{
-            width: 500,
-            height: hint ? 64 : 32 //  /* если выбор из списка, то маленькая (32), если ручной ввод и требуется подсказка, то большая 64 */
-          }}
+          hint={hint}
         >
           <Suggest
             createNewItemFromQuery={maybeCreateNewItemFromQuery}
             createNewItemRenderer={maybeCreateNewItemRenderer}
-            items={this.props.items}
+            items={items}
             itemRenderer={this.renderItem}
-            itemListPredicate={this.props.filterItems}
+            itemListPredicate={filterItems}
             onQueryChange={this.onQueryChange}
             closeOnSelect={true}
             openOnKeyDown={false}
@@ -199,7 +221,7 @@ export class QuickSelect extends React.Component {
               placeholder
             }}
           />
-        </div>
+        </SuggestContainerStyle>
       </Dialog>
     )
   }
