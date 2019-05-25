@@ -4,10 +4,10 @@ import { GlobalStyle } from './style'
 import { QuickSelect } from './quickselect/component'
 
 const items = [
-  { title: 'alpha', subtitle: 'src', icon: 'assets/material-icons/git.svg' },
-  { title: 'bravo', subtitle: 'src', icon: 'assets/material-icons/babel.svg' },
-  { title: 'charlie', subtitle: 'src', icon: 'assets/material-icons/nodejs.svg' },
-  { title: 'delta', subtitle: 'src', icon: 'assets/material-icons/file.svg' }
+  { title: 'alpha.js', subtitle: 'src', icon: 'assets/material-icons/git.svg' },
+  { title: 'bravo.js', subtitle: 'src', icon: 'assets/material-icons/babel.svg' },
+  { title: 'charlie.js', subtitle: 'src', icon: 'assets/material-icons/nodejs.svg' },
+  { title: 'delta.js', subtitle: 'src', icon: 'assets/material-icons/file.svg' }
 ]
 
 const filterItems = (query, items) => {
@@ -20,8 +20,9 @@ const filterItems = (query, items) => {
 }
 
 const filterItems2 = (query, items) => {
+  const filteredQuery = query.replace(/\s*|\..*$/gi, '')
   const filteredItems = items.filter(({ title, subtitle }) => {
-    return title.toLowerCase().indexOf(query.toLowerCase()) >= 0
+    return title.toLowerCase().indexOf(filteredQuery.toLowerCase()) >= 0
   })
 
   return filteredItems
@@ -38,6 +39,7 @@ export default class App extends PureComponent {
         <QuickSelect
           items={items}
           filterItems={filterItems}
+          noResultsText="No results found"
           darkTheme={true}
           onClosed={() => {
             console.log('onClosed')
@@ -50,17 +52,16 @@ export default class App extends PureComponent {
          */}
 
         <QuickSelect
-          unique={true}
+          shouldCreateNewItems={true}
           filterItems={filterItems2}
           items={items}
+          noResultsText={null}
           darkTheme={true}
-          onClosed={() => {
-            console.log('onClosed')
+          onClosed={() => {}}
+          onSelect={({ title }) => {
+            console.log('SELECT:', title)
           }}
-          onSelect={value => {
-            console.log('SELECT:', value)
-          }}
-          placeholder="Select an item"
+          placeholder="Controller name"
         />
       </>
     )

@@ -105,19 +105,41 @@ export class QuickSelect extends React.Component {
 
   onQueryChange = query => {
     // тут можно, например, вызывать колбек для перехода на строку редактора
+    this.setState({ isInvalid: /\s/.test(query) })
   }
 
   handleValueChange = value => {
+    if (this.state.isInvalid) return
+
+    const selectExistent = this.props.items.includes(value)
+
+    if (selectExistent) {
+      if (this.props.shouldCreateNewItems) {
+        this.setState({ isInvalid: true })
+        return
+      }
+    }
+
     this.setState({ isOpen: false })
     this.props.onSelect(value)
   }
 
-  renderInputValue = inputValue => {
-    return inputValue
+  renderInputValue = ({ title }) => {
+    return title
   }
+
+  renderCreateOption = (query, active, handleClick) => (
+    <MenuItem icon="add" text={`Create "${query}"`} active={active} onClick={handleClick} shouldDismissPopover={true} />
+  )
 
   render() {
     const { placeholder, hint } = this.props
+
+    const noResults = this.props.noResultsText ? <MenuItem disabled={true} text={this.props.noResultsText} /> : null
+
+    const maybeCreateNewItemRenderer =
+      this.props.shouldCreateNewItems && !this.state.isInvalid ? this.renderCreateOption : null
+    const maybeCreateNewItemFromQuery = this.props.shouldCreateNewItems ? query => ({ title: query }) : null
 
     return (
       <Dialog
@@ -145,6 +167,8 @@ export class QuickSelect extends React.Component {
           }}
         >
           <Suggest
+            createNewItemFromQuery={maybeCreateNewItemFromQuery}
+            createNewItemRenderer={maybeCreateNewItemRenderer}
             items={this.props.items}
             itemRenderer={this.renderItem}
             itemListPredicate={this.props.filterItems}
@@ -155,7 +179,7 @@ export class QuickSelect extends React.Component {
             resetOnQuery={true}
             resetOnSelect={false}
             inputValueRenderer={this.renderInputValue}
-            noResults={<MenuItem disabled={true} text="No results found" />}
+            noResults={noResults}
             onItemSelect={this.handleValueChange}
             usePortal={false}
             popoverProps={{
@@ -170,7 +194,7 @@ export class QuickSelect extends React.Component {
               },
               small: true,
               fill: true,
-              intent: this.state.intent,
+              intent: this.state.isInvalid ? Intent.DANGER : Intent.PRIMARY,
               className: 'quickOpenInput',
               placeholder
             }}
